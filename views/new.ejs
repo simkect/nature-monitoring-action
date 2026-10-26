@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+<h2>Take Picture</h2>
+<div class="camera-container">
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas" style="display:none"></canvas>
+  <form id="upload-form" method="POST" action="/photos" enctype="multipart/form-data">
+    <input type="text" name="caption" placeholder="Caption / Observation notes" required class="full-width">
+    <input type="hidden" name="metadata" id="metadata-input">
+    <input type="hidden" name="labels" id="labels-input">
+    <button type="button" id="captureBtn" class="btn-primary">Capture & Save</button>
+  </form>
+  <p id="status">Loading AI Model...</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<script src="/js/capture.js"></script>
+<%- include('partials/footer') %>

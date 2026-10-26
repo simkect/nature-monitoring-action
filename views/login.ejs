@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+<div class="auth-box">
+  <h1>Nature Monitoring Action</h1>
+  <p>Making changes App</p>
+  <div class="image-placeholder"><img src="/assets/epaLogo.png" alt="Logo Of The Agency" width="30%"></div>
+  <% if (error) { %><p class="error"><%= error %></p><% } %>
+  <form action="/login" method="POST">
+    <input type="text" name="username" placeholder="Email Address / Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit" class="btn-primary">Login</button>
+  </form>
+  <p class="small-text">Don't have an account? <a href="/register">Sign Up</a></p>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,7 @@
+.env
+node_modules
+public
+routes
+views/partials
+package-lock.json
+middleware
