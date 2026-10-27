@@ -2,11 +2,19 @@
 <div class="auth-box">
   <h1>Sign Up</h1>
   <div class="image-placeholder"><img src="/assets/epaLogo.png" alt="Logo Of The Agency" width="30%"></div>
-  <% if (error) { %><p class="error"><%= error %></p><% } %>
+  <p>Create an account to start monitoring nature.</p>
+  
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+  
   <form action="/register" method="POST">
-    <input type="text" name="username" placeholder="Email Address / Username" required>
+    <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <button type="submit" class="btn-primary">Register</button>
   </form>
+  
+  <p class="small-text" style="margin-top: 20px;">Already have an account?</p>
+  <a href="/login" class="btn-secondary" style="display: block; width: 100%; box-sizing: border-box;">Back to Login</a>
 </div>
 <%- include('partials/footer') %>
