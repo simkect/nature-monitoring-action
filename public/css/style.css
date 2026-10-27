@@ -460,3 +460,19 @@ video {
   min-width: 180px;
   color: var(--text);
 }
+
+/* ===== App Footer ===== */
+.app-footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  text-align: center;
+  margin-top: auto; /* Pushes footer to the bottom of the flex container */
+}
+
+.app-footer span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
