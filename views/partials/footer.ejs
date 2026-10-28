@@ -1,7 +1,29 @@
-    </main>
-        <footer class="app-footer">
-      <span>Nature Monitoring Action &copy; <%= new Date().getFullYear() %> | Environmental Protection Agency of Montenegro</span>
-    </footer>
-  </div>
+</main>
+<footer class="app-footer">
+  <span>Nature Monitoring Action &copy; <%= new Date().getFullYear() %> | Environmental Protection Agency of
+      Montenegro</span>
+</footer>
+<script>
+  function toggleMenu() {
+    const btn = document.getElementById('menuBtn');
+    const panel = document.getElementById('navPanel');
+
+    btn.classList.toggle('active');
+    panel.classList.toggle('active');
+  }
+
+  // Close menu when clicking outside of it
+  document.addEventListener('click', function (event) {
+    const panel = document.getElementById('navPanel');
+    const btn = document.getElementById('menuBtn');
+
+    if (panel && btn && !panel.contains(event.target) && !btn.contains(event.target)) {
+      panel.classList.remove('active');
+      btn.classList.remove('active');
+    }
+  });
+</script>
+</div>
 </body>
+
 </html>

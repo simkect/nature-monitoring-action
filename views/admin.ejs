@@ -21,7 +21,7 @@
           <td>
             <% if (u._id.toString() !== user._id.toString()) { %>
               <form action="/admin/users/<%= u._id %>?_method=DELETE" method="POST" class="inline-form">
-                <button type="submit" class="btn-danger btn-small" onclick="return confirm('Are you sure you want to delete <%= u.username %>?')">Delete</button>
+                <button type="submit" class="btn-danger btn-small" onclick="return confirm('Are you sure you want to delete <%= u.username %>? This will permanently delete ALL their uploaded photos and data.')">Delete</button>
               </form>
             <% } else { %>
               <span class="small-text">(You)</span>

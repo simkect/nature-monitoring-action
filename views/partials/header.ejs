@@ -17,23 +17,57 @@
     </div>
 
     <% if (user) { %>
-      <nav>
-        <a href="/photos">Home</a>
-        <a href="/photos/new">Take Picture</a>
-        <a href="/photos/map">Map</a>
-
-        <% if (user.role==='admin' ) { %>
-          <a href="/admin" style="color: var(--gold);">Admin Panel</a>
+      <nav class="main-nav">
+        
+        <!-- DESKTOP NAVIGATION (Visible > 768px) -->
+        <div class="desktop-nav">
+          <a href="/photos" class="desktop-link">Home</a>
+          <a href="/photos/new" class="desktop-link">Take Picture</a>
+          <a href="/photos/map" class="desktop-link">Map</a>
+          <% if (user.role === 'admin') { %>
+            <a href="/admin" class="desktop-link admin-link">Admin Panel</a>
           <% } %>
-
-            <span class="spacer"></span>
-
+          
+          <div class="desktop-spacer"></div>
+          
+          <div class="desktop-user">
             <span>👤 <%= user.username %> (<%= user.role %>)</span>
             <form action="/logout" method="POST" class="inline-form">
               <input type="hidden" name="_method" value="DELETE">
               <button type="submit" class="btn-logout">Logout</button>
             </form>
+          </div>
+        </div>
+
+        <!-- MOBILE NAVIGATION (Visible < 768px) -->
+        <button class="menu-btn" id="menuBtn" onclick="toggleMenu()" aria-label="Toggle navigation">
+          <span class="line line1"></span>
+          <span class="line line2"></span>
+          <span class="line line3"></span>
+        </button>
+
+        <div class="nav-panel" id="navPanel">
+          <div class="nav-header">Menu</div>
+          <a href="/photos" class="nav-item"><span class="nav-icon">🏠</span> Home</a>
+          <a href="/photos/new" class="nav-item"><span class="nav-icon">📸</span> Take Picture</a>
+          <a href="/photos/map" class="nav-item"><span class="nav-icon">🗺️</span> Map</a>
+          <% if (user.role === 'admin') { %>
+            <a href="/admin" class="nav-item admin-link"><span class="nav-icon">⚙️</span> Admin Panel</a>
+          <% } %>
+          
+          <div class="nav-divider"></div>
+          
+          <div class="nav-user">
+            <span>👤 <%= user.username %></span>
+            <span class="role-badge role-<%= user.role %>"><%= user.role %></span>
+          </div>
+          
+          <form action="/logout" method="POST" class="nav-form">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" class="btn-logout">Logout</button>
+          </form>
+        </div>
       </nav>
-      <% } %>
+    <% } %>
 
         <main class="window-content">

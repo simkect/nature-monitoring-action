@@ -1,5 +1,8 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
+const Photo = require('../models/Photo');
+const { GridFSBucket } = require('mongodb');
 const User = require('../models/User');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
@@ -41,7 +44,6 @@ router.post('/register', async (req, res) => {
     req.session.user = {
       _id: user._id,
       username: user.username,
-      role: user.role
     };
     res.redirect('/photos');
   } catch (err) {
@@ -55,13 +57,39 @@ router.get('/admin', requireAdmin, async (req, res) => {
   res.render('admin', { users });
 });
 
+// Delete User and ALL their associated data
 router.delete('/admin/users/:id', requireAdmin, async (req, res) => {
-  // Prevent the admin from deleting themselves
-  if (req.params.id === req.session.user._id.toString()) {
-    return res.redirect('/admin');
+  try {
+    const userId = req.params.id;
+
+    // 1. Prevent admin from deleting themselves
+    if (userId === req.session.user._id.toString()) {
+      return res.redirect('/admin'); 
+    }
+
+    // 2. Find all photos uploaded by this user
+    const userPhotos = await Photo.find({ author: userId });
+
+    // 3. Initialize GridFS bucket to delete image files
+    const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'photos' });
+
+    // 4. Loop through photos, delete the image file, then the photo document
+    for (const photo of userPhotos) {
+      const files = await bucket.find({ filename: photo.filename }).toArray();
+      if (files.length > 0) {
+        await bucket.delete(files[0]._id); // Deletes the actual image file
+      }
+      await photo.deleteOne(); // Deletes the MongoDB document record
+    }
+
+    // 5. Finally, delete the User
+    await User.findByIdAndDelete(userId);
+
+    res.redirect('/admin');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting user and their data");
   }
-  await User.findByIdAndDelete(req.params.id);
-  res.redirect('/admin');
 });
 
 // ===== Logout =====
