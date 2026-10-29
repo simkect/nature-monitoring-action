@@ -109,4 +109,12 @@ router.post('/logout', (req, res) => {
   });
 });
 
+// Session check for tab-restore detection
+router.get('/auth/check', (req, res) => {
+  if (req.session.user) {
+    return res.json({ ok: true, user: req.session.user.username });
+  }
+  res.status(401).json({ ok: false });
+});
+
 module.exports = router;
