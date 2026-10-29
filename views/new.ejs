@@ -1,16 +1,53 @@
 <%- include('partials/header') %>
 <h2>Take Picture</h2>
-<div class="camera-container">
-  <video id="video" autoplay playsinline></video>
-  <canvas id="canvas" style="display:none"></canvas>
-  <form id="upload-form" method="POST" action="/photos" enctype="multipart/form-data">
-    <input type="text" name="caption" placeholder="Caption / Observation notes" required class="full-width">
-    <input type="hidden" name="metadata" id="metadata-input">
-    <input type="hidden" name="labels" id="labels-input">
-    <button type="button" id="captureBtn" class="btn-primary">Capture & Save</button>
-  </form>
-  <p id="status">Loading AI Model...</p>
+
+<!-- Tab switcher -->
+<div class="tab-switcher">
+  <button class="tab-btn active" onclick="switchTab('camera', this)">📷 Camera</button>
+  <button class="tab-btn" onclick="switchTab('upload', this)">💻 Upload from PC</button>
 </div>
+
+<!-- CAMERA TAB -->
+<div id="camera-tab" class="tab-content active">
+  <div class="camera-container">
+    <div class="zoom-controls">
+      <button type="button" onclick="zoom(1.2)" title="Zoom In">＋</button>
+      <span id="zoom-level">1.0x</span>
+      <button type="button" onclick="zoom(0.8)" title="Zoom Out">－</button>
+    </div>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none"></canvas>
+    <form id="camera-form" method="POST" action="/photos" enctype="multipart/form-data">
+      <input type="text" name="caption" placeholder="Caption / Observation notes" required class="full-width">
+      <input type="hidden" name="metadata" id="metadata-input">
+      <input type="hidden" name="labels" id="labels-input">
+      <button type="button" id="captureBtn" class="btn-primary">Capture & Save</button>
+    </form>
+    <p id="status">Loading AI Model...</p>
+  </div>
+</div>
+
+<!-- UPLOAD TAB -->
+<div id="upload-tab" class="tab-content">
+  <div class="camera-container">
+    <form id="upload-form" method="POST" action="/photos" enctype="multipart/form-data">
+      <label for="image-file">Choose an image from your computer:</label>
+      <input type="file" id="image-file" name="image" accept="image/*" required>
+      
+      <input type="text" name="caption" placeholder="Caption / Observation notes" required class="full-width">
+      
+      <input type="hidden" name="metadata" id="upload-metadata">
+      <input type="hidden" name="labels" id="upload-labels">
+      
+      <img id="preview" style="display:none; max-width:100%; border-radius:8px; margin:10px 0;">
+      <div id="upload-predictions" class="predictions"></div>
+      
+      <button type="submit" class="btn-primary" id="upload-submit" disabled>Upload & Save</button>
+    </form>
+    <p id="upload-status"></p>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 <script src="/js/capture.js"></script>

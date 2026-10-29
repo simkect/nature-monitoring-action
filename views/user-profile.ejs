@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+
+<div class="profile-header">
+  <h1>👤 <%= profileUser.username %></h1>
+  <p><%= photos.length %> contribution(s) • Role: <span class="role-badge role-<%= profileUser.role %>"><%= profileUser.role %></span></p>
+</div>
+
+<div class="photo-grid">
+  <% photos.forEach(photo => { %>
+    <div class="photo-card">
+      <a href="/photos/<%= photo._id %>" class="card-image-link">
+        <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
+      </a>
+      <div class="card-content">
+        <p class="card-title"><%= photo.caption %></p>
+        <small class="small-text">
+          📅 <%= new Date(photo.metadata.capturedAt).toLocaleDateString() %>
+        </small>
+        <div class="card-actions">
+          <a href="/photos/<%= photo._id %>" class="btn-view">View</a>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<a href="/photos" class="btn-secondary">← Back to All Photos</a>
+
+<%- include('partials/footer') %>
