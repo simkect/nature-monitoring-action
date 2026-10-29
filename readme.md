@@ -1,7 +1,6 @@
 # 🍃 Nature Monitoring Action
 
-![Nature Monitoring Action Logo](public/images/logo.png) 
-<!-- Replace the line above with your actual screenshot or logo path, e.g., ![App Screenshot](screenshot.png) -->
+![Nature Monitoring Action Logo](/public/assets/epaLogo.png) 
 
 ## 📖 Description
 
