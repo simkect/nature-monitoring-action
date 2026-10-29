@@ -2,32 +2,36 @@
   <h2>Your Contributions</h2>
 
   <!-- ===== FILTER BAR ===== -->
-  <form method="GET" action="/photos" class="filter-bar">
-    <input type="text" name="search" placeholder="Search caption..." value="<%= filters.search || '' %>">
+<form method="GET" action="/photos" class="filter-bar">
+  <input type="text" name="search" placeholder="Search caption..." value="<%= filters.search || '' %>">
+  
+  <select name="user">
+    <option value="">All Users</option>
+    <% users.forEach(u => { %>
+      <option value="<%= u._id %>" <%= filters.user === u._id.toString() ? 'selected' : '' %>>
+        <%= u.username %>
+      </option>
+    <% }) %>
+  </select>
 
-    <select name="user">
-      <option value="">All Users</option>
-      <% users.forEach(u=> { %>
-        <option value="<%= u._id %>" <%=filters.user===u._id.toString() ? 'selected' : '' %>>
-          <%= u.username %>
-        </option>
-        <% }) %>
-    </select>
+  <select name="label">
+    <option value="">All Objects</option>
+    <% allLabels.forEach(l => { %>
+      <option value="<%= l %>" <%= filters.label === l ? 'selected' : '' %>><%= l %></option>
+    <% }) %>
+  </select>
 
-    <select name="label">
-      <option value="">All Objects</option>
-      <% allLabels.forEach(l=> { %>
-        <option value="<%= l %>" <%=filters.label===l ? 'selected' : '' %>><%= l %>
-        </option>
-        <% }) %>
-    </select>
+  <!-- Quick date buttons -->
+  <button type="button" class="btn-small" onclick="setDate(0)">Today</button>
+  <button type="button" class="btn-small" onclick="setDate(7)">Last 7 days</button>
+  <button type="button" class="btn-small" onclick="setDate(30)">Last 30 days</button>
 
-    <input type="date" name="dateFrom" value="<%= filters.dateFrom || '' %>" title="From date">
-    <input type="date" name="dateTo" value="<%= filters.dateTo || '' %>" title="To date">
+  <input type="date" name="dateFrom" id="dateFrom" value="<%= filters.dateFrom || '' %>">
+  <input type="date" name="dateTo" id="dateTo" value="<%= filters.dateTo || '' %>">
 
-    <button type="submit" class="btn-primary btn-small">Filter</button>
-    <a href="/photos" class="btn-secondary btn-small">Clear</a>
-  </form>
+  <button type="submit" class="btn-primary btn-small">Filter</button>
+  <a href="/photos" class="btn-secondary btn-small">Clear</a>
+</form>
 
   <!-- ===== PHOTO GRID ===== -->
   <div class="photo-grid">
@@ -58,5 +62,5 @@
           </div>
           <% }) %>
   </div>
-
+  <script src="/js/index.js"></script>
   <%- include('partials/footer') %>

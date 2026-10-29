@@ -88,6 +88,11 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
       caption: req.body.caption || 'Untitled Observation',
       metadata: {
         capturedAt: meta.capturedAt || new Date().toISOString(),
+        capturedDate: meta.capturedDate,
+        capturedTime: meta.capturedTime,
+        capturedDay: meta.capturedDay,
+        capturedYear: meta.capturedYear,
+        capturedMonth: meta.capturedMonth,
         latitude: meta.latitude,
         longitude: meta.longitude,
         compassHeading: meta.compassHeading

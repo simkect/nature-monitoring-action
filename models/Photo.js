@@ -13,7 +13,12 @@ const photoSchema = new mongoose.Schema({
     latitude: Number,
     longitude: Number,
     compassHeading: Number,
-    capturedAt: { type: Date, default: Date.now }
+    capturedAt: { type: Date, default: Date.now },
+    capturedDate: String,    // "29 October 2026"
+    capturedTime: String,    // "14:32"
+    capturedDay: String,     // "2026-10-29" (for grouping)
+    capturedYear: Number,    // 2026
+    capturedMonth: Number    // 10
   },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });

@@ -6,14 +6,24 @@
     <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>" class="main-image">
 
     <div class="meta-info">
-      <p>📅 Captured: <%= new Date(photo.metadata.capturedAt).toLocaleString() %>
-      </p>
-      <p>🧭 Heading: <%= photo.metadata.compassHeading ? photo.metadata.compassHeading.toFixed(1) + '°' : 'N/A' %>
-      </p>
-      <p>📍 Coords: <%= photo.metadata.latitude?.toFixed(4) || 'N/A' %>, <%= photo.metadata.longitude?.toFixed(4)
-            || 'N/A' %>
-      </p>
-      <p>🏷️ AI Recognized: <%= photo.labels.map(l=> l.label).join(', ') || 'None' %></p>
+      <% if (photo.metadata.capturedDate) { %>
+        <p>📅 <strong>
+            <%= photo.metadata.capturedDate %>
+          </strong></p>
+        <p>🕒 Captured at <strong>
+            <%= photo.metadata.capturedTime %>
+          </strong></p>
+        <% } else { %>
+          <p>📅 <%= new Date(photo.metadata.capturedAt).toLocaleString() %>
+          </p>
+          <% } %>
+
+            <p>🧭 Heading: <%= photo.metadata.compassHeading ? photo.metadata.compassHeading.toFixed(1) + '°' : 'N/A' %>
+            </p>
+            <p>📍 Coords: <%= photo.metadata.latitude?.toFixed(4) || 'N/A' %>, <%= photo.metadata.longitude?.toFixed(4)
+                  || 'N/A' %>
+            </p>
+            <p>🏷️ AI Recognized: <%= photo.labels.map(l=> l.label).join(', ') || 'None' %></p>
     </div>
 
     <div class="actions">
