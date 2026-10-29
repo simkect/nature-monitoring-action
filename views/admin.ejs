@@ -1,36 +1,41 @@
 <%- include('partials/header') %>
 
-<h2>Admin Panel: Manage Users</h2>
+  <h2>Admin Panel: Manage Users</h2>
 
-<div class="admin-table-container">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% users.forEach(u => { %>
+  <div class="admin-table-container">
+    <table class="admin-table">
+      <thead>
         <tr>
-          <td><%= u.username %></td>
-          <td>
-            <span class="role-badge role-<%= u.role %>"><%= u.role %></span>
-          </td>
-          <td>
-            <% if (u._id.toString() !== user._id.toString()) { %>
-              <form action="/admin/users/<%= u._id %>?_method=DELETE" method="POST" class="inline-form">
-                <button type="submit" class="btn-danger btn-small" onclick="return confirm('Are you sure you want to delete <%= u.username %>? This will permanently delete ALL their uploaded photos and data.')">Delete</button>
-              </form>
-            <% } else { %>
-              <span class="small-text">(You)</span>
-            <% } %>
-          </td>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Actions</th>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody>
+        <% users.forEach(u=> { %>
+          <tr>
+            <td>
+              <%= u.username %>
+            </td>
+            <td>
+              <span class="role-badge role-<%= u.role %>">
+                <%= u.role %>
+              </span>
+            </td>
+            <td>
+              <% if (u._id.toString() !==user._id.toString()) { %>
+                <form action="/admin/users/<%= u._id %>?_method=DELETE" method="POST" class="inline-form">
+                  <button type="submit" class="btn-danger btn-small"
+                    onclick="return confirm('Are you sure you want to delete <%= u.username %>?')">Delete</button>
+                </form>
+                <% } else { %>
+                  <span class="small-text">(You)</span>
+                  <% } %>
+            </td>
+          </tr>
+          <% }) %>
+      </tbody>
+    </table>
+  </div>
 
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>

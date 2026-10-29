@@ -55,9 +55,8 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
     const fd = new FormData(form);
     fd.append('image', blob, 'capture.jpg');
     
-    // Submit manually since we have the blob
     fetch('/photos', { method: 'POST', body: fd })
       .then(res => { window.location.href = '/photos'; })
-      .catch(err => status.textContent = 'Upload failed');
+      .catch(err => textContent = 'Upload failed');
   }, 'image/jpeg', 0.9);
 });

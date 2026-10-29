@@ -1,23 +1,30 @@
 <%- include('partials/header') %>
-<div class="detail-view">
-  <h2><%= photo.caption %></h2>
-  <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>" class="main-image">
-  
-  <div class="meta-info">
-    <p>📅 Captured: <%= new Date(photo.metadata.capturedAt).toLocaleString() %></p>
-    <p>🧭 Heading: <%= photo.metadata.compassHeading ? photo.metadata.compassHeading.toFixed(1) + '°' : 'N/A' %></p>
-    <p>📍 Coords: <%= photo.metadata.latitude?.toFixed(4) || 'N/A' %>, <%= photo.metadata.longitude?.toFixed(4) || 'N/A' %></p>
-    <p>🏷️ AI Recognized: <%= photo.labels.map(l => l.label).join(', ') || 'None' %></p>
-  </div>
+  <div class="detail-view">
+    <h2>
+      <%= photo.caption %>
+    </h2>
+    <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>" class="main-image">
 
-  <div class="actions">
-    <a href="/photos" class="btn-secondary">Back to Home</a>
-    <% if (photo.author._id.toString() === user._id.toString()) { %>
-      <a href="/photos/<%= photo._id %>/edit" class="btn-primary">Edit</a>
-      <form action="/photos/<%= photo._id %>?_method=DELETE" method="POST" class="inline-form">
-        <button type="submit" class="btn-danger">Delete</button>
-      </form>
-    <% } %>
+    <div class="meta-info">
+      <p>📅 Captured: <%= new Date(photo.metadata.capturedAt).toLocaleString() %>
+      </p>
+      <p>🧭 Heading: <%= photo.metadata.compassHeading ? photo.metadata.compassHeading.toFixed(1) + '°' : 'N/A' %>
+      </p>
+      <p>📍 Coords: <%= photo.metadata.latitude?.toFixed(4) || 'N/A' %>, <%= photo.metadata.longitude?.toFixed(4)
+            || 'N/A' %>
+      </p>
+      <p>🏷️ AI Recognized: <%= photo.labels.map(l=> l.label).join(', ') || 'None' %></p>
+    </div>
+
+    <div class="actions">
+      <a href="/photos" class="btn-secondary">Back to Home</a>
+
+      <% if (photo.author._id.toString()===user._id.toString()) { %>
+        <a href="/photos/<%= photo._id %>/edit" class="btn-primary">Edit</a>
+        <form action="/photos/<%= photo._id %>?_method=DELETE" method="POST" class="inline-form">
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+        <% } %>
+    </div>
   </div>
-</div>
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>

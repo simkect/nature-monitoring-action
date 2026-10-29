@@ -11,6 +11,7 @@ router.get('/', (req, res) => res.redirect('/photos'));
 // ===== Login =====
 router.get('/login', (req, res) => {
   if (req.session.user) return res.redirect('/photos');
+  res.set('Cache-Control', 'no-store');
   res.render('login', { error: null });
 });
 

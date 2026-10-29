@@ -1,22 +1,29 @@
 <%- include('partials/header') %>
-<h2>Your Contribution</h2>
-<div class="photo-grid">
-  <% photos.forEach(photo => { %>
-    <div class="photo-card">
-      <a href="/photos/<%= photo._id %>">
-        <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
-      </a>
-      <div class="card-content">
-        <p><strong><%= photo.caption %></strong></p>
-        <p class="small-text">By: <%= photo.author.username %></p>
-        <div class="card-actions">
-          <a href="/photos/<%= photo._id %>" class="btn-small">View</a>
-          <% if (photo.author._id.toString() === user._id.toString()) { %>
-            <a href="/photos/<%= photo._id %>/edit" class="btn-small">Edit</a>
-          <% } %>
+  <h2>Your Contribution</h2>
+  <div class="photo-grid">
+    <% photos.forEach(photo=> { %>
+      <div class="photo-card">
+        <a href="/photos/<%= photo._id %>" class="card-image-link">
+          <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
+        </a>
+
+        <div class="card-content">
+          <p class="card-title">
+            <%= photo.caption %>
+          </p>
+
+          <div class="card-meta">
+            <span>👤 <%= photo.author.username %></span>
+          </div>
+          <div class="card-actions">
+            <a href="/photos/<%= photo._id %>" class="btn-view">View</a>
+            <% if (photo.author._id.toString()===user._id.toString()) { %>
+              <a href="/photos/<%= photo._id %>/edit" class="btn-view">Edit</a>
+              <% } %>
+          </div>
+
         </div>
       </div>
-    </div>
-  <% }) %>
-</div>
-<%- include('partials/footer') %>
+      <% }) %>
+  </div>
+  <%- include('partials/footer') %>
