@@ -1,13 +1,3 @@
-const token = null; // Not needed — using session cookies
-
-// ===== TAB SWITCHING =====
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`${name}-tab`).classList.add('active');
-  btn.classList.add('active');
-}
-
 // ===== CAMERA LOGIC =====
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
@@ -16,14 +6,39 @@ const status = document.getElementById('status');
 let stream = null;
 let currentHeading = null;
 let model = null;
-let zoomLevel = 1.0;
+let track = null;
+
+// Zoom tracking variables
+let currentZoom = 1.0;
+let minZoom = 1.0;
+let maxZoom = 1.0;
+let supportsHardwareZoom = false;
 
 (async function initCamera() {
   try {
+    // Request camera with ideal resolution
     stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'environment', width: { ideal: 1280 } } 
+      video: { facingMode: 'environment', width: { ideal: 1920 } } 
     });
     video.srcObject = stream;
+
+    // Get the video track to manipulate zoom
+    track = stream.getVideoTracks()[0];
+    
+    // Check if the device supports hardware zoom
+    const capabilities = track.getCapabilities();
+    if (capabilities.zoom) {
+      supportsHardwareZoom = true;
+      minZoom = capabilities.zoom.min || 1;
+      maxZoom = capabilities.zoom.max || 5;
+      currentZoom = minZoom;
+      updateZoomUI();
+    } else {
+      // Fallback for devices without hardware zoom (e.g., older laptops)
+      document.getElementById('zoom-controls').style.display = 'none';
+    }
+
+    // Load the AI model
     model = await mobilenet.load({ version: 2, alpha: 1.0 });
     status.textContent = '✅ Ready. Point camera and capture.';
   } catch (err) {
@@ -31,14 +46,70 @@ let zoomLevel = 1.0;
   }
 })();
 
-// Zoom functionality using CSS transform
-function zoom(factor) {
-  zoomLevel = Math.min(3.0, Math.max(0.5, zoomLevel * factor));
-  document.getElementById('zoom-level').textContent = zoomLevel.toFixed(1) + 'x';
-  video.style.transform = `scale(${zoomLevel})`;
+// Apply the zoom level to the hardware
+async function applyHardwareZoom(newZoom) {
+  if (!supportsHardwareZoom) return;
+  
+  // Clamp the zoom between min and max
+  newZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+  currentZoom = newZoom;
+  
+  try {
+    await track.applyConstraints({
+      advanced: [{ zoom: currentZoom }]
+    });
+    updateZoomUI();
+  } catch (err) {
+    console.warn('Failed to apply zoom:', err);
+  }
 }
 
-// Compass
+// Update the +/- display text
+function updateZoomUI() {
+  const display = document.getElementById('zoom-level');
+  if (display) display.textContent = currentZoom.toFixed(1) + 'x';
+}
+
+// Button zoom (for desktop/no touch)
+function zoom(factor) {
+  if (!supportsHardwareZoom) return;
+  applyHardwareZoom(currentZoom * factor);
+}
+
+// Pinch-to-zoom (for touch devices)
+let initialPinchDistance = null;
+let initialZoomAtPinch = null;
+
+video.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    initialPinchDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    initialZoomAtPinch = currentZoom;
+  }
+}, { passive: true });
+
+video.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2 && initialPinchDistance !== null) {
+    const currentDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    
+    const factor = currentDistance / initialPinchDistance;
+    const newZoom = initialZoomAtPinch * factor;
+    
+    applyHardwareZoom(newZoom);
+  }
+}, { passive: true });
+
+video.addEventListener('touchend', () => {
+  initialPinchDistance = null;
+  initialZoomAtPinch = null;
+}, { passive: true });
+
+// ===== METADATA =====
 window.addEventListener('deviceorientationabsolute', e => {
   if (e.alpha !== null) currentHeading = e.alpha;
 });
@@ -57,22 +128,15 @@ function getPosition() {
   });
 }
 
+// ===== CAPTURE =====
 document.getElementById('captureBtn').addEventListener('click', async () => {
   status.textContent = '📸 Capturing…';
 
-  // Draw video frame to canvas (accounting for zoom)
+  // Draw exactly what the camera sees (hardware zoom is already applied to the stream)
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  
-  // Apply zoom by scaling the drawn image
-  const scaledW = canvas.width / zoomLevel;
-  const scaledH = canvas.height / zoomLevel;
-  const offsetX = (canvas.width - scaledW) / 2;
-  const offsetY = (canvas.height - scaledH) / 2;
-  ctx.drawImage(video, offsetX, offsetY, scaledW, scaledH, 0, 0, canvas.width, canvas.height);
+  canvas.getContext('2d').drawImage(video, 0, 0);
 
-  // Get metadata
   const pos = await getPosition();
   const metadata = {
     capturedAt: new Date().toISOString(),
@@ -80,7 +144,6 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
     ...pos
   };
 
-  // AI classification
   let labels = [];
   if (model) {
     try {
@@ -92,7 +155,6 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
   document.getElementById('metadata-input').value = JSON.stringify(metadata);
   document.getElementById('labels-input').value = JSON.stringify(labels);
 
-  // Submit
   canvas.toBlob(blob => {
     const fd = new FormData(document.getElementById('camera-form'));
     fd.append('image', blob, 'capture.jpg');
@@ -100,75 +162,4 @@ document.getElementById('captureBtn').addEventListener('click', async () => {
       .then(() => window.location.href = '/photos')
       .catch(err => status.textContent = 'Upload failed: ' + err.message);
   }, 'image/jpeg', 0.9);
-});
-
-// ===== UPLOAD TAB LOGIC =====
-const fileInput = document.getElementById('image-file');
-const preview = document.getElementById('preview');
-const uploadStatus = document.getElementById('upload-status');
-const uploadPredictions = document.getElementById('upload-predictions');
-const uploadSubmit = document.getElementById('upload-submit');
-
-fileInput?.addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  // Show preview
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    preview.src = ev.target.result;
-    preview.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-
-  uploadStatus.textContent = '🔍 Analyzing image…';
-
-  // AI classification on uploaded image
-  const img = new Image();
-  img.onload = async () => {
-    let labels = [];
-    if (model) {
-      try {
-        const preds = await model.classify(img, 5);
-        labels = preds.map(p => ({ label: p.className, probability: p.probability }));
-      } catch {}
-    }
-
-    document.getElementById('upload-labels').value = JSON.stringify(labels);
-    
-    // Show predictions
-    uploadPredictions.innerHTML = labels.map(l => `
-      <div class="pred">
-        <span class="pred-label">${l.label}</span>
-        <span class="pred-bar"><span style="width:${(l.probability * 100).toFixed(0)}%"></span></span>
-        <span class="pred-prob">${(l.probability * 100).toFixed(0)}%</span>
-      </div>
-    `).join('');
-
-    // Try to extract metadata (compass/GPS may not apply to uploads)
-    const pos = await getPosition();
-    const metadata = {
-      capturedAt: new Date().toISOString(),
-      compassHeading: currentHeading,
-      ...pos
-    };
-    document.getElementById('upload-metadata').value = JSON.stringify(metadata);
-
-    uploadSubmit.disabled = false;
-    uploadStatus.textContent = '✅ Ready to upload';
-  };
-  img.src = URL.createObjectURL(file);
-});
-
-// Handle upload form submission
-document.getElementById('upload-form')?.addEventListener('submit', (e) => {
-  // Ensure metadata/labels are set before submit
-  if (!document.getElementById('upload-metadata').value) {
-    document.getElementById('upload-metadata').value = JSON.stringify({
-      capturedAt: new Date().toISOString()
-    });
-  }
-  if (!document.getElementById('upload-labels').value) {
-    document.getElementById('upload-labels').value = '[]';
-  }
 });

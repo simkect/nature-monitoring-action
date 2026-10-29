@@ -54,7 +54,14 @@ router.post('/register', async (req, res) => {
 
 // ===== Admin Dashboard =====
 router.get('/admin', requireAdmin, async (req, res) => {
-  const users = await User.find().sort({ username: 1 });
+  const users = await User.find();
+  
+  users.sort((a, b) => {
+    if (a.role === 'admin' && b.role !== 'admin') return -1;
+    if (b.role === 'admin' && a.role !== 'admin') return 1;
+    return a.username.localeCompare(b.username);
+  });
+  
   res.render('admin', { users });
 });
 

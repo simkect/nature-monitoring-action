@@ -13,9 +13,10 @@
       </thead>
       <tbody>
         <% users.forEach(u=> { %>
-          <tr>
+          <tr class="<%= u.role === 'admin' ? 'admin-row' : '' %>">
             <td>
               <%= u.username %>
+                <% if (u.role==='admin' ) { %> ⚙️<% } %>
             </td>
             <td>
               <span class="role-badge role-<%= u.role %>">
@@ -26,7 +27,7 @@
               <% if (u._id.toString() !==user._id.toString()) { %>
                 <form action="/admin/users/<%= u._id %>?_method=DELETE" method="POST" class="inline-form">
                   <button type="submit" class="btn-danger btn-small"
-                    onclick="return confirm('Are you sure you want to delete <%= u.username %>?')">Delete</button>
+                    onclick="return confirm('Delete <%= u.username %> and ALL their photos?')">Delete</button>
                 </form>
                 <% } else { %>
                   <span class="small-text">(You)</span>

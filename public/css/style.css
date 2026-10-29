@@ -642,6 +642,50 @@ input[type="file"]:hover {
   border-color: var(--green);
 }
 
+/* ===== Admin Row Highlight ===== */
+.admin-row td {
+  background: rgba(165, 209, 42, 0.08) !important;
+  font-weight: 700;
+}
+.admin-row:hover td {
+  background: rgba(165, 209, 42, 0.15) !important;
+}
+
+/* ===== Admin Notice ===== */
+.admin-notice {
+  background: rgba(165, 209, 42, 0.15);
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--green-dark);
+  text-align: left;
+}
+
+/* ===== Camera View ===== */
+.camera-container { 
+  max-width: 500px; 
+  margin: auto; 
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+video {
+  width: 100%;
+  max-height: 40vh;
+  min-height: 250px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: #000;
+  margin-bottom: 15px;
+  border: 1px solid var(--border);
+  
+  /* Critical for pinch-to-zoom: prevents the whole page from zooming */
+  touch-action: none; 
+}
+
 /* ===== Responsive: Mobile & Tablet ===== */
 @media (max-width: 768px) {
   body { padding: 0; }

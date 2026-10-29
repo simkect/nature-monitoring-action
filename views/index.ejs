@@ -1,59 +1,62 @@
 <%- include('partials/header') %>
-<h2>Your Contributions</h2>
+  <h2>Your Contributions</h2>
 
-<!-- ===== FILTER BAR ===== -->
-<form method="GET" action="/photos" class="filter-bar">
-  <input type="text" name="search" placeholder="Search caption..." value="<%= filters.search || '' %>">
-  
-  <select name="user">
-    <option value="">All Users</option>
-    <% users.forEach(u => { %>
-      <option value="<%= u._id %>" <%= filters.user === u._id.toString() ? 'selected' : '' %>>
-        <%= u.username %>
-      </option>
-    <% }) %>
-  </select>
+  <!-- ===== FILTER BAR ===== -->
+  <form method="GET" action="/photos" class="filter-bar">
+    <input type="text" name="search" placeholder="Search caption..." value="<%= filters.search || '' %>">
 
-  <select name="label">
-    <option value="">All Objects</option>
-    <% allLabels.forEach(l => { %>
-      <option value="<%= l %>" <%= filters.label === l ? 'selected' : '' %>><%= l %></option>
-    <% }) %>
-  </select>
+    <select name="user">
+      <option value="">All Users</option>
+      <% users.forEach(u=> { %>
+        <option value="<%= u._id %>" <%=filters.user===u._id.toString() ? 'selected' : '' %>>
+          <%= u.username %>
+        </option>
+        <% }) %>
+    </select>
 
-  <input type="date" name="dateFrom" value="<%= filters.dateFrom || '' %>" title="From date">
-  <input type="date" name="dateTo" value="<%= filters.dateTo || '' %>" title="To date">
+    <select name="label">
+      <option value="">All Objects</option>
+      <% allLabels.forEach(l=> { %>
+        <option value="<%= l %>" <%=filters.label===l ? 'selected' : '' %>><%= l %>
+        </option>
+        <% }) %>
+    </select>
 
-  <button type="submit" class="btn-primary btn-small">Filter</button>
-  <a href="/photos" class="btn-secondary btn-small">Clear</a>
-</form>
+    <input type="date" name="dateFrom" value="<%= filters.dateFrom || '' %>" title="From date">
+    <input type="date" name="dateTo" value="<%= filters.dateTo || '' %>" title="To date">
 
-<!-- ===== PHOTO GRID ===== -->
-<div class="photo-grid">
-  <% if (photos.length === 0) { %>
-    <p>No photos match your filters.</p>
-  <% } %>
-  <% photos.forEach(photo => { %>
-    <div class="photo-card">
-      <a href="/photos/<%= photo._id %>" class="card-image-link">
-        <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
-      </a>
-      <div class="card-content">
-        <p class="card-title"><%= photo.caption %></p>
-        <div class="card-actions">
-          <a href="/photos/<%= photo._id %>" class="btn-view">View</a>
-          <% if (photo.author._id.toString() === user._id.toString()) { %>
-            <a href="/photos/<%= photo._id %>/edit" class="btn-view">Edit</a>
-          <% } %>
-        </div>
-        <div class="card-meta">
-          <a href="/photos/user/<%= photo.author._id %>" class="user-link">
-            👤 <%= photo.author.username %>
-          </a>
-        </div>
-      </div>
-    </div>
-  <% }) %>
-</div>
+    <button type="submit" class="btn-primary btn-small">Filter</button>
+    <a href="/photos" class="btn-secondary btn-small">Clear</a>
+  </form>
 
-<%- include('partials/footer') %>
+  <!-- ===== PHOTO GRID ===== -->
+  <div class="photo-grid">
+    <% if (photos.length===0) { %>
+      <p>No photos match your filters.</p>
+      <% } %>
+        <% photos.forEach(photo=> { %>
+          <div class="photo-card">
+            <a href="/photos/<%= photo._id %>" class="card-image-link">
+              <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
+            </a>
+            <div class="card-content">
+              <p class="card-title">
+                <%= photo.caption %>
+              </p>
+              <div class="card-actions">
+                <a href="/photos/<%= photo._id %>" class="btn-view">View</a>
+                <% if (photo.author._id.toString()===user._id.toString() || user.role==='admin' ) { %>
+                  <a href="/photos/<%= photo._id %>/edit" class="btn-view">Edit</a>
+                  <% } %>
+              </div>
+              <div class="card-meta">
+                <a href="/photos/user/<%= photo.author._id %>" class="user-link">
+                  👤 <%= photo.author.username %>
+                </a>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+  </div>
+
+  <%- include('partials/footer') %>

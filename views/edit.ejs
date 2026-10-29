@@ -1,11 +1,18 @@
 <%- include('partials/header') %>
 <div class="auth-box">
   <h2>Edit Observation</h2>
+  
+  <% if (isAdmin && photo.author._id.toString() !== user._id.toString()) { %>
+    <div class="admin-notice">
+      ⚙️ <strong>Admin Mode:</strong> You are editing a photo by <strong><%= photo.author.username %></strong>.
+    </div>
+  <% } %>
+  
   <form action="/photos/<%= photo._id %>?_method=PUT" method="POST">
     <label>Caption:</label>
     <input type="text" name="caption" value="<%= photo.caption %>" required>
     <button type="submit" class="btn-primary">Update</button>
   </form>
-  <a href="/photos/<%= photo._id %>" class="btn-secondary mt-2">Cancel</a>
+  <a href="/photos/<%= photo._id %>" class="btn-secondary mt-2" style="display:block; text-align:center; margin-top:12px;">Cancel</a>
 </div>
 <%- include('partials/footer') %>

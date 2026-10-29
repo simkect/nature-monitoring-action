@@ -19,10 +19,11 @@
     <div class="actions">
       <a href="/photos" class="btn-secondary">Back to Home</a>
 
-      <% if (photo.author._id.toString()===user._id.toString()) { %>
+      <% if (isOwner || isAdmin) { %>
         <a href="/photos/<%= photo._id %>/edit" class="btn-primary">Edit</a>
+
         <form action="/photos/<%= photo._id %>?_method=DELETE" method="POST" class="inline-form">
-          <button type="submit" class="btn-danger">Delete</button>
+          <button type="submit" class="btn-danger" onclick="return confirm('Delete this photo?')">Delete</button>
         </form>
         <% } %>
     </div>

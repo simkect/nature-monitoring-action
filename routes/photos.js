@@ -108,35 +108,53 @@ router.get('/map', requireAuth, async (req, res) => {
   res.render('map', { photos });
 });
 
-// SHOW
+// SHOW — pass isAdmin and isOwner to the template
 router.get('/:id', requireAuth, async (req, res) => {
   const photo = await Photo.findById(req.params.id).populate('author');
   if (!photo) return res.redirect('/photos');
-  res.render('show', { photo });
+  
+  const isOwner = photo.author._id.toString() === req.session.user._id.toString();
+  const isAdmin = req.session.user.role === 'admin';
+  
+  res.render('show', { photo, isOwner, isAdmin });
 });
 
-// EDIT
+// EDIT — allow owner OR admin
 router.get('/:id/edit', requireAuth, async (req, res) => {
   const photo = await Photo.findById(req.params.id);
-  if (!photo || photo.author._id.toString() !== req.session.user._id.toString()) {
-    return res.redirect('/photos');
-  }
-  res.render('edit', { photo });
+  if (!photo) return res.redirect('/photos');
+  
+  const isOwner = photo.author._id.toString() === req.session.user._id.toString();
+  const isAdmin = req.session.user.role === 'admin';
+  
+  if (!isOwner && !isAdmin) return res.redirect('/photos');
+  
+  res.render('edit', { photo, isAdmin });
 });
 
-// UPDATE
+// UPDATE — allow owner OR admin
 router.put('/:id', requireAuth, async (req, res) => {
   const photo = await Photo.findById(req.params.id);
-  if (photo && photo.author._id.toString() === req.session.user._id.toString()) {
+  if (!photo) return res.redirect('/photos');
+  
+  const isOwner = photo.author._id.toString() === req.session.user._id.toString();
+  const isAdmin = req.session.user.role === 'admin';
+  
+  if (isOwner || isAdmin) {
     await Photo.findByIdAndUpdate(req.params.id, { caption: req.body.caption });
   }
   res.redirect(`/photos/${req.params.id}`);
 });
 
-// DELETE
+// DELETE — allow owner OR admin
 router.delete('/:id', requireAuth, async (req, res) => {
   const photo = await Photo.findById(req.params.id);
-  if (photo && photo.author._id.toString() === req.session.user._id.toString()) {
+  if (!photo) return res.redirect('/photos');
+  
+  const isOwner = photo.author._id.toString() === req.session.user._id.toString();
+  const isAdmin = req.session.user.role === 'admin';
+  
+  if (isOwner || isAdmin) {
     const files = await bucket.find({ filename: photo.filename }).toArray();
     if (files[0]) await bucket.delete(files[0]._id);
     await photo.deleteOne();
