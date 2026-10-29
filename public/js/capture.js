@@ -107,34 +107,54 @@ function formatDate(date) {
 }
 
 // ===== HELPER FUNCTIONS =====
-function groupPredictions(predictions, threshold = 0.05) {
+function groupPredictions(predictions, threshold = 0.10) {
   const grouped = {};
   
   predictions.forEach(p => {
+    // Ignore very low confidence guesses
     if (p.probability < threshold) return;
+    
     const raw = p.className.toLowerCase();
     let matchedGroup = null;
+    
+    // Check if any known keyword is inside this label
     for (const [keyword, group] of Object.entries(LABEL_LOOKUP)) {
       if (raw.includes(keyword)) {
         matchedGroup = group;
         break;
       }
     }
+    
     const finalLabel = matchedGroup || raw;
+    
+    // Keep the highest probability for this group
     if (!grouped[finalLabel] || grouped[finalLabel].probability < p.probability) {
-      grouped[finalLabel] = { label: finalLabel, probability: p.probability };
+      grouped[finalLabel] = { 
+        label: finalLabel, 
+        probability: p.probability 
+      };
     }
   });
   
+  // Sort by highest probability and return ONLY the top 2
   return Object.values(grouped)
     .sort((a, b) => b.probability - a.probability)
-    .slice(0, 3);
+    .slice(0, 2); 
 }
 
 function buildSummarySentence(groups) {
-  if (!groups || groups.length === 0) return "Unknown";
+  if (!groups || groups.length === 0) return "Could not recognize the image";
+  
   const top = groups[0];
+  const second = groups[1];
   const confidence = Math.round(top.probability * 100);
+  
+  // If we have two good guesses
+  if (second && second.probability > 0.15) {
+    return `The image likely shows ${top.label} or ${second.label}.`;
+  }
+  
+  // Otherwise, one guess based on confidence
   if (confidence >= 75) return `The image clearly shows ${top.label}.`;
   if (confidence >= 40) return `The image likely shows ${top.label}.`;
   return `The image may contain ${top.label}.`;

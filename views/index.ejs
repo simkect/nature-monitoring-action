@@ -1,66 +1,80 @@
 <%- include('partials/header') %>
+
+<div class="gallery-header">
   <h2>Your Contributions</h2>
-
-  <!-- ===== FILTER BAR ===== -->
-<form method="GET" action="/photos" class="filter-bar">
-  <input type="text" name="search" placeholder="Search caption..." value="<%= filters.search || '' %>">
   
-  <select name="user">
-    <option value="">All Users</option>
-    <% users.forEach(u => { %>
-      <option value="<%= u._id %>" <%= filters.user === u._id.toString() ? 'selected' : '' %>>
-        <%= u.username %>
-      </option>
-    <% }) %>
-  </select>
+  <button type="button" class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()">
+    <span>🔍 Filters</span>
+    <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+</div>
 
-  <select name="label">
-    <option value="">All Objects</option>
-    <% allLabels.forEach(l => { %>
-      <option value="<%= l %>" <%= filters.label === l ? 'selected' : '' %>><%= l %></option>
-    <% }) %>
-  </select>
+<!-- Collapsible filter panel -->
+<div class="filter-panel" id="filterPanel">
+  <form method="GET" action="/photos" class="filter-bar">
+    <input type="text" name="search" placeholder="Search caption..." value="<%= filters.search || '' %>">
+    
+    <select name="user">
+      <option value="">All Users</option>
+      <% users.forEach(u => { %>
+        <option value="<%= u._id %>" <%= filters.user === u._id.toString() ? 'selected' : '' %>>
+          <%= u.username %>
+        </option>
+      <% }) %>
+    </select>
 
-  <!-- Quick date buttons -->
-  <button type="button" class="btn-small" onclick="setDate(0)">Today</button>
-  <button type="button" class="btn-small" onclick="setDate(7)">Last 7 days</button>
-  <button type="button" class="btn-small" onclick="setDate(30)">Last 30 days</button>
+    <select name="label">
+      <option value="">All Objects</option>
+      <% allLabels.forEach(l => { %>
+        <option value="<%= l %>" <%= filters.label === l ? 'selected' : '' %>><%= l %></option>
+      <% }) %>
+    </select>
 
-  <input type="date" name="dateFrom" id="dateFrom" value="<%= filters.dateFrom || '' %>">
-  <input type="date" name="dateTo" id="dateTo" value="<%= filters.dateTo || '' %>">
+    <div class="quick-dates">
+      <button type="button" class="btn-quick" onclick="setDate(0)">Today</button>
+      <button type="button" class="btn-quick" onclick="setDate(7)">7 days</button>
+      <button type="button" class="btn-quick" onclick="setDate(30)">30 days</button>
+    </div>
 
-  <button type="submit" class="btn-primary btn-small">Filter</button>
-  <a href="/photos" class="btn-secondary btn-small">Clear</a>
-</form>
+    <input type="date" name="dateFrom" id="dateFrom" value="<%= filters.dateFrom || '' %>">
+    <input type="date" name="dateTo" id="dateTo" value="<%= filters.dateTo || '' %>">
 
-  <!-- ===== PHOTO GRID ===== -->
-  <div class="photo-grid">
-    <% if (photos.length===0) { %>
-      <p>No photos match your filters.</p>
-      <% } %>
-        <% photos.forEach(photo=> { %>
-          <div class="photo-card">
-            <a href="/photos/<%= photo._id %>" class="card-image-link">
-              <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
-            </a>
-            <div class="card-content">
-              <p class="card-title">
-                <%= photo.caption %>
-              </p>
-              <div class="card-actions">
-                <a href="/photos/<%= photo._id %>" class="btn-view">View</a>
-                <% if (photo.author._id.toString()===user._id.toString() || user.role==='admin' ) { %>
-                  <a href="/photos/<%= photo._id %>/edit" class="btn-view">Edit</a>
-                  <% } %>
-              </div>
-              <div class="card-meta">
-                <a href="/photos/user/<%= photo.author._id %>" class="user-link">
-                  👤 <%= photo.author.username %>
-                </a>
-              </div>
-            </div>
-          </div>
-          <% }) %>
-  </div>
-  <script src="/js/index.js"></script>
-  <%- include('partials/footer') %>
+    <div class="filter-actions">
+      <button type="submit" class="btn-primary btn-small">Apply</button>
+      <a href="/photos" class="btn-secondary btn-small">Clear</a>
+    </div>
+  </form>
+</div>
+
+<!-- Photo grid -->
+<div class="photo-grid">
+  <% if (photos.length === 0) { %>
+    <p class="empty-state">No photos match your filters.</p>
+  <% } %>
+  <% photos.forEach(photo => { %>
+    <div class="photo-card">
+      <a href="/photos/<%= photo._id %>" class="card-image-link">
+        <img src="/photos/image/<%= photo.filename %>" alt="<%= photo.caption %>">
+      </a>
+      <div class="card-content">
+        <p class="card-title"><%= photo.caption %></p>
+        <div class="card-actions">
+          <a href="/photos/<%= photo._id %>" class="btn-view">View</a>
+          <% if (photo.author._id.toString() === user._id.toString() || user.role === 'admin') { %>
+            <a href="/photos/<%= photo._id %>/edit" class="btn-view">Edit</a>
+          <% } %>
+        </div>
+        <div class="card-meta">
+          <a href="/photos/user/<%= photo.author._id %>" class="user-link">
+            👤 <%= photo.author.username %>
+          </a>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<script src="/js/index.js"></script>
+<%- include('partials/footer') %>
