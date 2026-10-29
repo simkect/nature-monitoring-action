@@ -48,4 +48,6 @@ app.use((req, res, next) => {
 app.use('/', require('./routes/auth'));
 app.use('/photos', require('./routes/photos'));
 
-app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
+// app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
+
+module.exports = app;
